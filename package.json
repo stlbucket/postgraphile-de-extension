@@ -1,0 +1,22 @@
+{
+  "name": "postgraphile-de-extension",
+  "version": "1.0.0",
+  "description": "an IDE for postgraphile",
+  "main": "index.js",
+  "repository": "https://github.com/stlbucket/postgraphile-de-extension.git",
+  "author": "stlbucket <stlbucket@gmail.com>",
+  "license": "MIT",
+  "private": false,
+  "dependencies": {
+    "apollo-boost": "^0.1.16",
+    "apollo-engine": "^1.1.0",
+    "camelcase": "^5.0.0",
+    "express": "^4.16.3",
+    "fbkt-clog": "^1.0.5",
+    "graphile-utils": "^4.0.0-rc.9",
+    "pm2": "^3.0.4"
+  },
+  "devDependencies": {
+    "http-proxy-middleware": "^0.19.0"
+  }
+}
