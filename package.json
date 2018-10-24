@@ -1,6 +1,6 @@
 {
   "name": "postgraphile-de-extension",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "an IDE for postgraphile",
   "main": "index.js",
   "repository": "https://github.com/stlbucket/postgraphile-de-extension.git",
