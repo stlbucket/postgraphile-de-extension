@@ -4,6 +4,8 @@ An IDE for Postgraphile
 
 this tool is still under construction, but you can try it out today!
 
+dev repo is here:  https://github.com/stlbucket/philede
+
 ## install
 ```
 yarn add postgraphile-de-extension
