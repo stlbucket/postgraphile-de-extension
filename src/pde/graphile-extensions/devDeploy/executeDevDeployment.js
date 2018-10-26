@@ -30,8 +30,8 @@ async function executeDevDeployment(args, pgClient) {
         clog('patchResult', patchResult)
         const devDeploymentSql = `
           WITH new_patch AS(
-            insert into pde.dev_deployment(ddl_down, status)
-            select '${patch.ddl_down}', 'DEPLOYED'
+            insert into pde.dev_deployment(project_id, ddl_down, status)
+            select '${patch.project_id}', '${patch.ddl_down}', 'DEPLOYED'
             RETURNING *
           )
           UPDATE pde.patch p
@@ -39,6 +39,7 @@ async function executeDevDeployment(args, pgClient) {
           FROM new_patch np
           WHERE p.id = ${patch.id}
         `
+        clog('devDeploymentSql', devDeploymentSql)
         const ddlSqlResult = await pgClient.query(devDeploymentSql, []);
         clog('ddlSqlResult', ddlSqlResult)
       }
@@ -48,8 +49,8 @@ async function executeDevDeployment(args, pgClient) {
           await pgClient.query("ROLLBACK TO SAVEPOINT ddl");
           const blah = `
             WITH new_patch AS(
-              insert into pde.dev_deployment(ddl_down, status)
-              select '', 'ERROR'
+              insert into pde.dev_deployment(project_id, ddl_down, status)
+              select ${patch.project_id}', '', 'ERROR'
               RETURNING *
             )
             UPDATE pde.patch p

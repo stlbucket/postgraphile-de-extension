@@ -1,0 +1,12 @@
+mutation ImportProject(
+  $projectInfo: JSON!
+){
+  importProject(input: {
+    _projectInfo: $projectInfo
+  }) {
+    pdeProject {
+      id
+      name
+    }
+  }
+}

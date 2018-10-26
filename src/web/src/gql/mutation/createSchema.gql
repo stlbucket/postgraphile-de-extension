@@ -1,0 +1,17 @@
+mutation CreateSchema(
+  $projectId: BigInt!
+  $name: String!
+){
+  createSchema (input: {
+    schema: {
+      projectId: $projectId
+      name: $name
+    }
+  }) {
+    schema {
+      id
+      projectId
+      name
+    }
+  }
+}

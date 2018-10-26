@@ -1,0 +1,76 @@
+query PdeProjectById(
+  $id: BigInt!
+) {
+  pdeProjectById(id: $id) {
+    id    
+    name
+    schemata: schemataByProjectId {
+      nodes {
+        id
+        name
+        artifacts: artifactsBySchemaId {
+          nodes {
+            id
+            name
+            artifactType: artifactTypeByArtifactTypeId {
+              id
+              name
+            }
+          }
+        }
+      }
+    }
+    releases: releasesByProjectId(orderBy: NUMBER_ASC) {
+      nodes {
+        id
+        name
+        number
+        status
+        projectId
+        locked
+        minors: minorsByReleaseId(
+          orderBy: NUMBER_ASC
+        ) {
+          nodes {
+            id
+            number
+            name
+            revision
+            locked
+            major: majorByMajorId {
+              id
+              name
+              revision
+            }
+            patches: patchesByMinorId(
+              orderBy: NUMBER_ASC
+            ) {
+              nodes {
+                id
+                number
+                revision
+                locked
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  allArtifactTypes {
+    nodes {
+      id
+      name
+      properties
+      patchTypes: patchTypesByArtifactTypeId {
+        nodes {
+          id
+          name
+          key
+        }
+      }
+    }
+  }
+
+}

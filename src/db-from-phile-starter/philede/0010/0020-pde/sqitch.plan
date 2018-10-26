@@ -1,0 +1,8 @@
+%syntax-version=1.0.0
+%project=0020-pde
+%uri=sqitch-phile/0020-pde
+
+ext/0010-extensions 2018-04-11T19:23:40Z Kevin Burkett <stlbucket@gmail.com> # postgresql extensions
+structure/0020-schema 2018-04-11T19:25:04Z Kevin Burkett <stlbucket@gmail.com> # pde schema
+structure/0050-artifact_type [ext/0010-extensions structure/0020-schema] 2018-04-11T19:28:23Z Kevin Burkett <stlbucket@gmail.com> # pg artifact type
+structure/0060-artifact [ext/0010-extensions structure/0020-schema structure/0050-artifact_type] 2018-04-11T19:29:23Z Kevin Burkett <stlbucket@gmail.com> # pg artifact

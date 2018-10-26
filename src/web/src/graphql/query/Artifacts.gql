@@ -1,0 +1,51 @@
+query {
+  allPdeProjects {
+    nodes {
+      id
+      name
+      majors: majorsByProjectId {
+        nodes {
+          id
+          revision
+          minors: minorsByMajorId {
+            nodes {
+              id
+              revision
+              patches: patchesByMinorId {
+                nodes {
+                  id
+                  revision
+                  ddl
+                  artifact: artifactByArtifactId {
+                    id
+                    name
+                    children: artifactRelationshipsByParentArtifactId {
+                      nodes {
+                        artifact: artifactByChildArtifactId {
+                          id
+                          name
+                          schema: schemaBySchemaId {
+                            id
+                            name
+                          }
+                          artifactType: artifactTypeByArtifactTypeId {
+                            id
+                            name
+                          }                    
+                        }
+                      }
+                    }
+                    artifactType: artifactTypeByArtifactTypeId {
+                      id
+                      name
+                    }                    
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

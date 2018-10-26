@@ -1,0 +1,33 @@
+mutation UpdatePatch(
+  $id: BigInt!
+  $ddlUp: String
+  $ddlDown: String
+) {
+  updatePatchById(input: {
+    id:	$id
+    patchPatch: {
+      ddlUp: $ddlUp
+      ddlDown: $ddlDown
+    }
+  }) {
+    patch {
+      id
+      ddlUp
+      ddlDown
+      number
+      locked
+      minor: minorByMinorId {
+        id
+        releaseId
+      }
+      artifact: artifactByArtifactId {
+        id
+        name
+        artifactType: artifactTypeByArtifactTypeId {
+          id
+          name
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "database": "phile",
+  "hostname": "localhost",
+  "packages": [
+    {
+      "path": "philede/0010/0020-pde"
+    }
+  ]
+}

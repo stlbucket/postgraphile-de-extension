@@ -1,0 +1,21 @@
+mutation CreatePdeProject(
+  $name: String!
+) {
+  createPdeProject(input: {
+    pdeProject: {
+      name: $name
+    }
+  }) {
+    pdeProject {
+      id
+      name
+      releases: releasesByProjectId {
+        nodes {
+          id
+          name
+          status
+        }
+      }
+    }
+  }
+}
