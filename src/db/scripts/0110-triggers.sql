@@ -91,13 +91,16 @@ CREATE FUNCTION pde.fn_update_release_number() RETURNS trigger AS $$
 BEGIN
   WITH max_patch_info AS (
     SELECT 
-      max(p.id) max_patch_id
+      p.id max_patch_id
+      ,p.number
       ,r.id release_id
     FROM pde.patch p
     JOIN pde.minor m ON p.minor_id = m.id
     JOIN pde.release r ON r.id = m.release_id
-    WHERE r.id = (SELECT release_id FROM pde.minor WHERE id = NEW.minor_id)
-    GROUP BY r.id
+    order by 
+      m.revision desc
+      ,p.revision desc
+    LIMIT 1
   )
   UPDATE pde.release
   SET number = (
