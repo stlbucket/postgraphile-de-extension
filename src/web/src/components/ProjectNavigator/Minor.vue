@@ -83,7 +83,7 @@ import MinorArtifactTree from './MinorArtifactTree'
 import MinorTestSuite from './MinorTestSuite'
 import MinorQuerySuite from './MinorQuerySuite'
 import deferMinor from '../../gql/mutation/deferMinor.gql'
-import promoteMinor from '../../gql/mutation/promoteMinor.gql'
+import advanceMinor from '../../gql/mutation/advanceMinor.gql'
 import deleteMinorById from '../../gql/mutation/deleteMinorById.gql'
 
 export default {
@@ -145,8 +145,8 @@ export default {
           return 'Defer'
         break;
         case 'FUTURE':
-          this.toggleDeferMutation = promoteMinor
-          return 'Promote'
+          this.toggleDeferMutation = advanceMinor
+          return 'Advance'
         break;
         default:
           return ''

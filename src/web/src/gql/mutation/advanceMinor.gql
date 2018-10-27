@@ -1,7 +1,7 @@
-mutation PromoteMinor(
+mutation AdvanceMinor(
   $minorId: BigInt!
 ){
-  promoteMinor(input: {
+  advanceMinor(input: {
     minorId: $minorId
   }) {
     minor {
