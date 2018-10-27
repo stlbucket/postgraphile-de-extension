@@ -84,10 +84,14 @@ CREATE TRIGGER tg_timestamp_before_update_patch
   EXECUTE PROCEDURE pde.fn_timestamp_update_patch();
 
 
-
--- fn_update_release_number
---||--
-CREATE FUNCTION pde.fn_update_release_number() RETURNS trigger AS $$
+------------------------------------------------
+-- build_patch_new_schema
+------------------------------------------------
+CREATE OR REPLACE FUNCTION pde.fn_update_release_number(
+    _release_id bigint
+  )
+  RETURNS boolean AS
+$BODY$
 BEGIN
   WITH max_patch_info AS (
     SELECT 
@@ -96,7 +100,7 @@ BEGIN
       ,r.id release_id
     FROM pde.patch p
     JOIN pde.minor m ON p.minor_id = m.id
-    JOIN pde.release r ON r.id = m.release_id
+    JOIN pde.release r ON r.id = m.release_id AND m.release_id = _release_id
     order by 
       m.revision desc
       ,p.revision desc
@@ -117,10 +121,83 @@ BEGIN
   AND status = 'DEVELOPMENT'
   ;
 
+  return true;
+END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE STRICT SECURITY DEFINER
+  COST 100;
+
+
+-- fn_update_release_number
+--||--
+CREATE FUNCTION pde.trigger_fn_update_release_number() RETURNS trigger AS $$
+DECLARE
+  _release_id bigint;
+BEGIN
+  -- WITH max_patch_info AS (
+  --   SELECT 
+  --     p.id max_patch_id
+  --     ,p.number
+  --     ,r.id release_id
+  --   FROM pde.patch p
+  --   JOIN pde.minor m ON p.minor_id = m.id
+  --   JOIN pde.release r ON r.id = m.release_id
+  --   order by 
+  --     m.revision desc
+  --     ,p.revision desc
+  --   LIMIT 1
+  -- )
+  -- UPDATE pde.release
+  -- SET number = (
+  --   SELECT 
+  --     lpad(ma.revision::text,4,'0') || '.' || lpad(mi.revision::text,4,'0') || '.' || lpad(pa.revision::text,4,'0') || '.development'
+  --   FROM max_patch_info mpi
+  --   JOIN pde.patch pa ON mpi.max_patch_id = pa.id
+  --   JOIN pde.minor mi ON pa.minor_id = mi.id
+  --   JOIN pde.major ma ON mi.major_id = ma.id
+  -- )
+  -- FROM max_patch_info mpi
+  -- WHERE id = mpi.release_id
+  -- AND locked = false
+  -- AND status = 'DEVELOPMENT'
+  -- ;
+  SELECT release_id INTO _release_id FROM pde.minor WHERE id = NEW.minor_id;
+
+  PERFORM pde.fn_update_release_number(_release_id);
+
   RETURN NEW;
 END; $$ LANGUAGE plpgsql;
 --||--
 CREATE TRIGGER tg_timestamp_after_update_patch
   AFTER INSERT OR UPDATE ON pde.patch
   FOR EACH ROW
-  EXECUTE PROCEDURE pde.fn_update_release_number();
+  EXECUTE PROCEDURE pde.trigger_fn_update_release_number();
+
+
+-- fn_calculate_minor_patch_numbers
+--||--
+CREATE FUNCTION pde.fn_adjust_minor_patch_numbers() RETURNS trigger AS $$
+DECLARE
+  _release_id bigint;
+  _revision integer;
+  _patch pde.patch;
+BEGIN
+  update pde.patch p
+  set 
+    revision = revision - 1
+    ,number = (select mi.number || '.' || lpad((p.revision-1)::text,4,'0') from pde.minor mi where mi.id = OLD.minor_id)
+  where minor_id = OLD.minor_id
+  and revision > OLD.revision
+  ;
+
+  SELECT release_id INTO _release_id FROM pde.minor WHERE id = OLD.minor_id;
+
+  PERFORM pde.fn_update_release_number(_release_id);
+
+  RETURN OLD;
+END; $$ LANGUAGE plpgsql;
+--||--
+CREATE TRIGGER tg_timestamp_after_delete_patch
+  AFTER DELETE ON pde.patch
+  FOR EACH ROW
+  EXECUTE PROCEDURE pde.fn_adjust_minor_patch_numbers();

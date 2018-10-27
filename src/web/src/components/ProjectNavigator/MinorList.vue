@@ -79,14 +79,18 @@ export default {
   created () {
     this.$eventHub.$on('minorDeferredToggled', this.queryRelease)
     this.$eventHub.$on('patchCreated', this.queryRelease)
+    this.$eventHub.$on('patchDeleted', this.queryRelease)
     this.$eventHub.$on('patchUpdated', this.queryRelease)
+    this.$eventHub.$on('minorDeleted', this.queryRelease)
     this.$eventHub.$on('newMinorCreated', this.queryRelease)
     this.$eventHub.$on('devDeployCompleted', this.queryRelease)
   },
   beforeDestroy() {
     this.$eventHub.$off('minorDeferredToggled')
     this.$eventHub.$off('patchCreated')
+    this.$eventHub.$off('patchDeleted')
     this.$eventHub.$off('patchUpdated')
+    this.$eventHub.$off('minorDeleted')
     this.$eventHub.$off('newMinorCreated')
     this.$eventHub.$off('devDeployCompleted')
   }

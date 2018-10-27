@@ -9,11 +9,29 @@
           ></v-text-field>
         </v-toolbar-title>
         <v-spacer></v-spacer>
+        <div :hidden="deleteHidden">
+          <v-btn 
+            @click="deletePatch"
+          >Delete
+          </v-btn>
+        </div>
+        <div :hidden="reallyDeleteHidden">
+          <v-btn 
+            @click="abortDeletePatch"
+          >No Just Kidding
+          </v-btn>
+        </div>
+        <v-spacer></v-spacer>
+        <div :hidden="reallyDeleteHidden">
+          <v-btn 
+            @click="reallyDeletePatch"
+          >Yes Really Delete
+        </v-btn>
+        </div>
+        <v-spacer></v-spacer>
         <v-btn 
           @click="save"
           :disabled="disableCommit"
-          v-shortkey.once="['ctrl', 'd']" 
-          @shortkey="theAction()"
         >Keep Changes
         </v-btn>
         <v-btn 
@@ -156,6 +174,7 @@
 import patchById from '../../gql/query/patchById.gql'
 import updateArtifact from '../../gql/mutation/updateArtifact.gql'
 import updatePatch from '../../gql/mutation/updatePatch.gql'
+import deletePatchById from '../../gql/mutation/deletePatchById.gql'
 import devDeployRelease from '../../gql/mutation/devDeployRelease.gql'
 import gql from 'graphql-tag'
 import ace from 'brace'
@@ -184,6 +203,31 @@ export default {
     },
     editName () {
       return true
+    },
+    deletePatch () {
+      this.deleteHidden = true
+      this.reallyDeleteHidden = false
+    },
+    reallyDeletePatch () {
+      this.deleteHidden = false
+      this.reallyDeleteHidden = true
+      this.$apollo.mutate({
+        mutation: deletePatchById,
+        variables: {
+          id: this.patch.id
+        }
+      })
+      .then(result => {
+        this.$eventHub.$emit('patchDeleted')
+      })
+      .catch(error => {
+        alert('ERROR')
+        console.log(error)
+      })
+    },
+    abortDeletePatch () {
+      this.deleteHidden = false
+      this.reallyDeleteHidden = true
     },
     save () {
       return this.$apollo.mutate({
@@ -348,7 +392,9 @@ export default {
       artifact: {},
       artifactName: '',
       errorMessage: '',
-      cursorPosition: {}
+      cursorPosition: {},
+      deleteHidden: false,
+      reallyDeleteHidden: true
     }
   }
 }

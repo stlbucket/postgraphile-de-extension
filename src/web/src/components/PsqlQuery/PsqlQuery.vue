@@ -131,7 +131,9 @@ export default {
   data () {
     this.$store.commit('clearFocus')
     return {
-      sql: `drop schema cards cascade;
+      sql: `select id, number, revision from pde.patch;
+
+ delete from pde.patch where id = 1886562983417480224
       `,
       results: 'results',
       name: ''

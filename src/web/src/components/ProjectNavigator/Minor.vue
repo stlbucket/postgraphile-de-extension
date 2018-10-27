@@ -4,9 +4,16 @@
       <v-toolbar-side-icon @click="toggleMinorHidden()"></v-toolbar-side-icon>
       <h3>{{ `${minor.number.split('.')[1]}-${minor.name}` }}</h3>
       <v-spacer></v-spacer>
-      <v-btn
-        @click="toggleDefer"
-      >{{ toggleDeferText }}</v-btn>
+      <div :hidden="deferHidden">
+        <v-btn
+          @click="toggleDefer"
+        >{{ toggleDeferText }}</v-btn>
+      </div>
+      <div :hidden="deleteHidden">
+        <v-btn
+          @click="deleteMinor"
+        >Delete</v-btn>
+      </div>
     </v-toolbar>
     <v-tabs
       dark
@@ -77,6 +84,7 @@ import MinorTestSuite from './MinorTestSuite'
 import MinorQuerySuite from './MinorQuerySuite'
 import deferMinor from '../../gql/mutation/deferMinor.gql'
 import promoteMinor from '../../gql/mutation/promoteMinor.gql'
+import deleteMinorById from '../../gql/mutation/deleteMinorById.gql'
 
 export default {
   name: "Minor",
@@ -106,9 +114,30 @@ export default {
         alert('ERROR')
         console.log('error', error)
       })
+    },
+    deleteMinor () {
+      this.$apollo.mutate({
+        mutation: deleteMinorById,
+        variables: {
+          id: this.minor.id
+        }
+      })
+      .then(result => {
+        this.$eventHub.$emit('minorDeleted')
+      })
+      .catch(error => {
+        alert('ERROR')
+        console.log(error)
+      })
     }
   },
   computed: {
+    deleteHidden () {
+      return this.minor.patches.nodes.length > 0
+    },
+    deferHidden () {
+      return this.minor.patches.nodes.length === 0
+    },
     toggleDeferText () {
       switch (this.minor.release.status) {
         case 'DEVELOPMENT':

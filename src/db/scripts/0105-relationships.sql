@@ -31,7 +31,7 @@ ALTER TABLE pde.patch ADD CONSTRAINT fk_patch_patch_type FOREIGN KEY (patch_type
 ALTER TABLE pde.patch ADD CONSTRAINT fk_patch_dev_deployment FOREIGN KEY (dev_deployment_id) REFERENCES pde.dev_deployment (id) ON DELETE SET NULL;
 
 -- todo: add dev_depl
-ALTER TABLE pde.dev_deployment ADD CONSTRAINT fk_dev_deployment_project FOREIGN KEY (project_id) REFERENCES pde.project (id) ON DELETE CASCADE;
+ALTER TABLE pde.dev_deployment ADD CONSTRAINT fk_dev_deployment_project FOREIGN KEY (project_id) REFERENCES pde.pde_project (id) ON DELETE CASCADE;
 
 -- psql_query
 ALTER TABLE pde.psql_query ADD CONSTRAINT fk_psql_query_project FOREIGN KEY (project_id) REFERENCES pde.pde_project (id) ON DELETE CASCADE;
