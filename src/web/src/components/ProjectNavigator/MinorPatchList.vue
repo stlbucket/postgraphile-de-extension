@@ -14,6 +14,8 @@
         >
           <v-list-tile-content>
             <v-list-tile-sub-title class="text--primary">
+              <v-icon small @click="promotePatch(patch)" :disabled="promoteDisabled(patch)">vertical_align_top</v-icon>
+              <v-icon small @click="demotePatch(patch)" :disabled="demoteDisabled(patch)">vertical_align_bottom</v-icon>
               <v-icon :color="patchStatusColor(patch)" small>fiber_manual_record</v-icon>
               {{ `Patch: ${patch.number.split('.')[2]} - ${patch.patchType.name} - ${patch.artifact.name}` }}
             </v-list-tile-sub-title>
@@ -30,6 +32,9 @@
 </template>
 
 <script>
+import promotePatch from '../../gql/mutation/promotePatch.gql'
+import demotePatch from '../../gql/mutation/demotePatch.gql'
+
 export default {
   name: "MinorPatchList",
   computed: {
@@ -41,6 +46,36 @@ export default {
     }
   },
   methods: {
+    promotePatch (patch) {
+      this.$apollo.mutate({
+        mutation: promotePatch,
+        variables: {
+          patchId: patch.id
+        }
+      })
+      .then(result => {
+        this.$eventHub.$emit('patchPromoted')
+      })
+      .catch(error => {
+        alert('ERROR')
+        console.log(error)
+      })
+    },
+    demotePatch (patch) {
+      this.$apollo.mutate({
+        mutation: demotePatch,
+        variables: {
+          patchId: patch.id
+        }
+      })
+      .then(result => {
+        this.$eventHub.$emit('patchDemoted')
+      })
+      .catch(error => {
+        alert('ERROR')
+        console.log(error)
+      })
+    },
     selected (patch) {
       this.$store.commit('focusPatchId', { focusPatchId: patch.id })
     },
@@ -52,6 +87,16 @@ export default {
     },
     patchStatusColor(patch) {
       return patch.devDeployment ? (patch.devDeployment.status === 'DEPLOYED' ? 'green' : 'red') : 'yellow'
+    },
+    promoteDisabled(patch) {
+      return patch.revision === 0
+    },
+    demoteDisabled(patch) {
+      return patch.revision === this.minor.patches.nodes.reduce(
+        (acc, patch) => {
+          return patch.revision > acc ? patch.revision : acc
+        }, 0
+      )
     }
   },
   watch: {

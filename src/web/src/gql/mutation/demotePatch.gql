@@ -1,0 +1,13 @@
+mutation DemotePatch(
+  $patchId: BigInt!
+) {
+  demotePatch(input: {
+    _patchId: $patchId
+  }) {
+    patch {
+      id
+      number
+      revision
+    }
+  }
+}

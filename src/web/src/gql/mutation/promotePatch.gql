@@ -1,0 +1,13 @@
+mutation PromotePatch(
+  $patchId: BigInt!
+) {
+  promotePatch(input: {
+    _patchId: $patchId
+  }) {
+    patch {
+      id
+      number
+      revision
+    }
+  }
+}
