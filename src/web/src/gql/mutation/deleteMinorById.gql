@@ -1,0 +1,12 @@
+mutation DeleteMinorById(
+  $id: BigInt!
+){
+  deleteMinorById(input: {
+    id: $id
+  }) {
+    minor {
+      id
+      number
+    }
+  }
+}

@@ -1,0 +1,12 @@
+mutation DeletePatchById(
+  $id: BigInt!
+){
+  deletePatchById(input: {
+    id: $id
+  }) {
+    patch {
+      id
+      number
+    }
+  }
+}
