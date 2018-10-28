@@ -1,19 +1,33 @@
 <template>
   <div>
     <v-toolbar dark>
-      <v-toolbar-side-icon @click="toggleMinorHidden()"></v-toolbar-side-icon>
-      <h3>{{ `${minor.number.split('.')[1]}-${minor.name}` }}</h3>
-      <v-spacer></v-spacer>
+      <v-tooltip bottom>
+        <v-icon selectable slot="activator" @click="promote" :disabled="promoteDisabled">vertical_align_top</v-icon>
+        <span>promote</span>
+      </v-tooltip>
+      <v-tooltip bottom>
+        <v-icon selectable slot="activator" @click="demote" :disabled="demoteDisabled">vertical_align_bottom</v-icon>
+        <span>demote</span>
+      </v-tooltip>
       <div :hidden="deferHidden">
-        <v-btn
+        <v-tooltip bottom>
+          <v-icon selectable slot="activator" @click="toggleDefer">{{ toggleDeferIcon }}</v-icon>
+          <span>{{ toggleDeferText }}</span>
+        </v-tooltip>
+        <!-- <v-btn
           @click="toggleDefer"
-        >{{ toggleDeferText }}</v-btn>
+        >{{ toggleDeferText }}</v-btn> -->
       </div>
       <div :hidden="deleteHidden">
-        <v-btn
-          @click="deleteMinor"
-        >Delete</v-btn>
+        <v-tooltip bottom>
+          <v-icon selectable slot="activator" @click="deleteMinor">clear</v-icon>
+          <span>delete</span>
+        </v-tooltip>
       </div>
+      <v-spacer></v-spacer> 
+      <h3>{{ `${minor.number.split('.')[1]}-${minor.name}` }}</h3>
+      <v-spacer></v-spacer> 
+      <v-toolbar-side-icon @click="toggleMinorHidden()"></v-toolbar-side-icon>
     </v-toolbar>
     <v-tabs
       dark
@@ -84,6 +98,8 @@ import MinorTestSuite from './MinorTestSuite'
 import MinorQuerySuite from './MinorQuerySuite'
 import deferMinor from '../../gql/mutation/deferMinor.gql'
 import advanceMinor from '../../gql/mutation/advanceMinor.gql'
+import promoteMinor from '../../gql/mutation/promoteMinor.gql'
+import demoteMinor from '../../gql/mutation/demoteMinor.gql'
 import deleteMinorById from '../../gql/mutation/deleteMinorById.gql'
 
 export default {
@@ -99,7 +115,7 @@ export default {
       this.hidden = !this.hidden
     },
     toggleDefer() {
-      // console.log('this.minor', this.minor)
+      console.log('this.minor', this.minor)
       this.$apollo.mutate({
         mutation: this.toggleDeferMutation,
         variables: {
@@ -129,14 +145,66 @@ export default {
         alert('ERROR')
         console.log(error)
       })
+    },
+    promote() {
+      this.$apollo.mutate({
+        mutation: promoteMinor,
+        variables: {
+          minorId:  this.minor.id
+        }
+      })
+      .then(result => {
+        console.log('result', result)
+        this.$eventHub.$emit('minorPromoted', this.minor)
+      })
+      .catch(error => {
+        alert('ERROR')
+        console.log('error', error)
+      })
+
+    },
+    demote() {
+      this.$apollo.mutate({
+        mutation: demoteMinor,
+        variables: {
+          minorId:  this.minor.id
+        }
+      })
+      .then(result => {
+        console.log('result', result)
+        this.$eventHub.$emit('minorDemoted', this.minor)
+      })
+      .catch(error => {
+        alert('ERROR')
+        console.log('error', error)
+      })
+
     }
   },
   computed: {
+    promoteDisabled () {
+
+    },
+    demoteDisabled () {
+
+    },
     deleteHidden () {
       return this.minor.patches.nodes.length > 0
     },
     deferHidden () {
       return this.minor.patches.nodes.length === 0
+    },
+    toggleDeferIcon () {
+      switch (this.minor.release.status) {
+        case 'DEVELOPMENT':
+          return 'call_received'
+        break;
+        case 'FUTURE':
+          return 'call_made'
+        break;
+        default:
+          return ''
+      }
     },
     toggleDeferText () {
       switch (this.minor.release.status) {

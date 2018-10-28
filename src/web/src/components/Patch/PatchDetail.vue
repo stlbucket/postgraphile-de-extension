@@ -42,7 +42,7 @@
       </v-toolbar>
       <v-toolbar :hidden="errorHidden" color="red">
         {{ errorMessage }}
-        {{ cursorPosition }}
+        <!-- {{ cursorPosition }} -->
       </v-toolbar>
       <v-card>
         <v-container
@@ -249,53 +249,40 @@ export default {
             },
             fetchPolicy: 'no-cache'
           })
-        .then(result => {
-          console.log('this.patch', this.patch.minor.releaseId)
-          return this.$apollo.mutate({
-            mutation: devDeployRelease,
-            variables: {
-              releaseId: this.patch.minor.releaseId
-            },
-            fetchPolicy: 'no-cache'
-          })
-        })
-        .then(result => {
-          this.errorMessage = ''
-        })
         .catch(error => {
-          const errObj = JSON.parse(error.toString().replace('Error: GraphQL error:', ''))
-          console.log(errObj)
-          console.log('PATCH BITCH', this.patch.ddlUp.split('\n'))
-          const errorLocation = this.patch.ddlUp.split('\n').reduce(
-            (acc, line) => {
-              console.log('line', line.length)
-              if (acc.totalPosition >= errObj.position) {
-                console.log('case 1')
-                return acc
-              } else {
-                if ((acc.totalPosition + line.length) >= errObj.position) {
-                  console.log('case 2')
-                  return {
-                    row: acc.row + 1,
-                    position: errObj.position - acc.totalPosition,
-                    totalPosition: acc.totalPosition + line.length
-                  }
-                } else {
-                console.log('case 3')
-                return {
-                    row: acc.row + 1,
-                    position: 0,
-                    totalPosition: acc.totalPosition + line.length
-                  }
-                }
-              }
-            }, {
-              row: 0,
-              position: 0,
-              totalPosition: 0
-            }
-          )
-          console.log('errorLocation', errorLocation)
+          // const errObj = JSON.parse(error.toString().replace('Error: GraphQL error:', ''))
+          // console.log(errObj)
+          // console.log('PATCH BITCH', this.patch.ddlUp.split('\n'))
+          // const errorLocation = this.patch.ddlUp.split('\n').reduce(
+          //   (acc, line) => {
+          //     console.log('line', line.length)
+          //     if (acc.totalPosition >= errObj.position) {
+          //       console.log('case 1')
+          //       return acc
+          //     } else {
+          //       if ((acc.totalPosition + line.length) >= errObj.position) {
+          //         console.log('case 2')
+          //         return {
+          //           row: acc.row + 1,
+          //           position: errObj.position - acc.totalPosition,
+          //           totalPosition: acc.totalPosition + line.length
+          //         }
+          //       } else {
+          //       console.log('case 3')
+          //       return {
+          //           row: acc.row + 1,
+          //           position: 0,
+          //           totalPosition: acc.totalPosition + line.length
+          //         }
+          //       }
+          //     }
+          //   }, {
+          //     row: 0,
+          //     position: 0,
+          //     totalPosition: 0
+          //   }
+          // )
+          // console.log('errorLocation', errorLocation)
           this.errorMessage = errObj.message
         })
         .finally(() => {
@@ -304,6 +291,9 @@ export default {
           this.$eventHub.$emit('patchUpdated', this.patch)
         })
       })
+    },
+    devDeployCompleted () {
+      this.$apollo.queries.loadPatch.refetch()
     },
     revert () {
       this.ddlUp = this.patch.ddlUp
@@ -322,20 +312,19 @@ export default {
       },
       update (data) {
         this.patch = data.patchById || {}
+        console.log('this.patch', this.patch)
+        this.errorMessage = this.patch.devDeployment ? this.patch.devDeployment.errorMessage : ''
         this.artifact = this.patch.artifact || {}
         this.artifactName = this.artifact.name
         this.ddlUp = this.patch.ddlUp || 'N/A'
         this.ddlDown = this.patch.ddlDown || 'N/A'
+      },
+      error (e) {
+        console.log('PD ERROR', e)
       }
     }
   },
   watch: {
-    patch () {
-      this.$store.commit('focusPatchId', {focusPatchId: this.patch.id})
-    },
-    // ddlUp () {
-    //   console.log(this.$refs.editorUp.getCursorPosition())
-    // }
   },
   computed: {
     focusPatchId () {
@@ -359,22 +348,10 @@ export default {
       return false  // Todo: this
     },
     errorHidden () {
-      return this.errorMessage === ''
+      console.log('this.errorMessage',this.errorMessage)
+      return this.errorMessage === '' || this.errorMessage === null
     }
   },
-  // beforeRouteUpdate (to, from, next) {
-  //   this.$emit('artifact-route', to.params.id)
-  //   this.captureWorkingDdl()
-  //   .then(result => {
-  //     next()
-  //   })
-  // },
-  // beforeRouteLeave (to, from, next) {
-  //   this.captureWorkingDdl()
-  //   .then(result => {
-  //     next()
-  //   })
-  // },
   data () {
     return {
       ddlUp: 'ddlUp',
@@ -396,6 +373,12 @@ export default {
       deleteHidden: false,
       reallyDeleteHidden: true
     }
+  },
+  created () {
+    this.$eventHub.$on('devDeployCompleted', this.devDeployCompleted)
+  },
+  beforeDestroy() {
+    this.$eventHub.$off('devDeployCompleted')
   }
 }
 </script>

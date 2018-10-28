@@ -33,7 +33,6 @@ export default {
       this.$eventHub.$emit('exploreRelease', this.focusRelease)
     },
     devDeployRelease () {
-      console.log('boowiojfe', this.focusReleaseId)
       this.$apollo.mutate({
         mutation: devDeployRelease,
         variables: {
@@ -45,7 +44,7 @@ export default {
         this.$eventHub.$emit('devDeployCompleted')
       })
       .catch(error => {
-        alert('ERROR')
+        // alert('ERROR')
         console.log(error)
         this.$eventHub.$emit('devDeployCompleted')
       })
@@ -70,7 +69,7 @@ export default {
       this.$apollo.queries.init.refetch()
     },
     focusRelease () {
-      this.focusReleaseId = this.focusRelease.id
+      this.focusReleaseId = this.focusRelease.id || ''
     }
   },
   apollo: { 

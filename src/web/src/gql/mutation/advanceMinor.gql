@@ -2,7 +2,7 @@ mutation AdvanceMinor(
   $minorId: BigInt!
 ){
   advanceMinor(input: {
-    minorId: $minorId
+    _minorId: $minorId
   }) {
     minor {
       id

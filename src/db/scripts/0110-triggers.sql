@@ -1,6 +1,6 @@
 -- fn_create_project_releases
 --||--
-CREATE FUNCTION pde.fn_create_project_releases() RETURNS trigger AS $$
+CREATE OR REPLACE FUNCTION pde.fn_create_project_releases() RETURNS trigger AS $$
 BEGIN
   INSERT INTO pde.release(
     project_id
@@ -33,7 +33,7 @@ CREATE TRIGGER tg_after_insert_pde_project
 
 -- fn_timestamp_update_minor
 --||--
-CREATE FUNCTION pde.fn_timestamp_update_minor() RETURNS trigger AS $$
+CREATE OR REPLACE FUNCTION pde.fn_timestamp_update_minor() RETURNS trigger AS $$
 BEGIN
   NEW.number = (select lpad(mj.revision::text,4,'0') || '.' || lpad(NEW.revision::text,4,'0') from pde.major mj where mj.id = NEW.major_id);
   RETURN NEW;
@@ -47,7 +47,7 @@ CREATE TRIGGER tg_timestamp_update_minor
 
 -- fn_timestamp_update_artifact
   --||--
-  CREATE FUNCTION pde.fn_timestamp_update_artifact() RETURNS trigger AS $$
+  CREATE OR REPLACE FUNCTION pde.fn_timestamp_update_artifact() RETURNS trigger AS $$
   DECLARE
     _artifact_type pde.artifact_type;
     _schema pde.schema;
@@ -66,24 +66,6 @@ CREATE TRIGGER tg_timestamp_update_minor
     BEFORE INSERT OR UPDATE ON pde.artifact
     FOR EACH ROW
     EXECUTE PROCEDURE pde.fn_timestamp_update_artifact();
-
-
-
--- fn_timestamp_update_patch
---||--
-CREATE FUNCTION pde.fn_timestamp_update_patch() RETURNS trigger AS $$
-BEGIN
-  IF NEW.revision = NULL THEN
-    NEW.revision := (select count(*) from pde.patch where minor_id = NEW.minor_id);
-  END IF;
-  NEW.number = (select mi.number || '.' || lpad(NEW.revision::text,4,'0') from pde.minor mi where mi.id = NEW.minor_id);
-  RETURN NEW;
-END; $$ LANGUAGE plpgsql;
---||--
-CREATE TRIGGER tg_timestamp_before_update_patch
-  BEFORE INSERT OR UPDATE ON pde.patch
-  FOR EACH ROW
-  EXECUTE PROCEDURE pde.fn_timestamp_update_patch();
 
 
 ------------------------------------------------
@@ -130,9 +112,25 @@ $BODY$
   COST 100;
 
 
--- fn_update_release_number
+-- fn_timestamp_update_patch
 --||--
-CREATE FUNCTION pde.trigger_fn_update_release_number() RETURNS trigger AS $$
+CREATE OR REPLACE FUNCTION pde.fn_timestamp_update_patch() RETURNS trigger AS $$
+BEGIN
+  IF NEW.revision IS NULL THEN
+    NEW.revision := (select count(*) from pde.patch where minor_id = NEW.minor_id);
+  END IF;
+  NEW.number = (select mi.number || '.' || lpad(NEW.revision::text,4,'0') from pde.minor mi where mi.id = NEW.minor_id);
+  RETURN NEW;
+END; $$ LANGUAGE plpgsql;
+--||--
+CREATE TRIGGER tg_timestamp_before_update_patch
+  BEFORE INSERT OR UPDATE ON pde.patch
+  FOR EACH ROW
+  EXECUTE PROCEDURE pde.fn_timestamp_update_patch();
+
+  -- fn_update_release_number
+--||--
+CREATE OR REPLACE FUNCTION pde.trigger_fn_update_release_number() RETURNS trigger AS $$
 DECLARE
   _release_id bigint;
 BEGIN
@@ -151,7 +149,7 @@ CREATE TRIGGER tg_timestamp_after_update_patch
 
 -- fn_calculate_minor_patch_numbers
 --||--
-CREATE FUNCTION pde.fn_adjust_minor_patch_numbers() RETURNS trigger AS $$
+CREATE OR REPLACE FUNCTION pde.fn_adjust_minor_patch_numbers() RETURNS trigger AS $$
 DECLARE
   _release_id bigint;
   _revision integer;

@@ -40,7 +40,6 @@ export default {
   },
   watch: {
     focusProjectId () {
-          console.log('WTF')
       this.$apollo.queries.init.refetch()
     },
     selectedProjectId () {

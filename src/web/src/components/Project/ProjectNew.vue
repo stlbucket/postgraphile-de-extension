@@ -33,8 +33,9 @@ export default {
         }
       })
       .then(result => {
-        this.$store.commit('focusProjectId', { focusProjectId: result.data.createPdeProject.pdeProject.id})
-        this.$store.commit('focusReleaseId', { focusReleaseId: result.data.createPdeProject.pdeProject.releases.nodes.find(r => r.status === 'DEVELOPMENT').id })
+        console.log('result', result)
+        this.project = result.data.createPdeProject.pdeProject
+        this.$eventHub.$emit('projectCreated', this.project)
       })
       .catch(error => {
         alert ('ERROR')

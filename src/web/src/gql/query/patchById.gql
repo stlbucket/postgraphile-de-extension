@@ -21,6 +21,7 @@ query PatchById(
     devDeployment: devDeploymentByDevDeploymentId {
       id
       status
+      errorMessage
     }
     minor: minorByMinorId {
       id

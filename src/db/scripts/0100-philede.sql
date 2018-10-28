@@ -186,6 +186,7 @@ CREATE TABLE pde.dev_deployment (
   id bigint UNIQUE NOT NULL DEFAULT shard_1.id_generator(),
   ddl_down text,
   project_id bigint NOT NULL,
+  error_message text,
   status pde.dev_deployment_status not null default 'DEPLOYED',
   deployed_at timestamp not null default current_timestamp,
   CONSTRAINT pk_dev_deployment PRIMARY KEY (id)

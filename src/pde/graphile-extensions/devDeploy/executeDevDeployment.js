@@ -23,11 +23,11 @@ async function executeDevDeployment(args, pgClient) {
     for (let j = 0; j < patches.rows.length; j++) {
       const patch = patches.rows[j]
       try {
-        clog('patch', patch)
+        // clog('patch', patch)
         await pgClient.query("SAVEPOINT ddl");
         const patchResult = await execDDL(patch.ddl_up, pgClient)
         await pgClient.query("RELEASE SAVEPOINT ddl");
-        clog('patchResult', patchResult)
+        // clog('patchResult', patchResult)
         const devDeploymentSql = `
           WITH new_patch AS(
             insert into pde.dev_deployment(project_id, ddl_down, status)
@@ -47,10 +47,10 @@ async function executeDevDeployment(args, pgClient) {
         clog('deploy ERROR', e)
         try{
           await pgClient.query("ROLLBACK TO SAVEPOINT ddl");
-          const blah = `
+          const devDeploymentSql = `
             WITH new_patch AS(
-              insert into pde.dev_deployment(project_id, ddl_down, status)
-              select ${patch.project_id}', '', 'ERROR'
+              insert into pde.dev_deployment(project_id, ddl_down, status, error_message)
+              select ${patch.project_id}, '', 'ERROR', '${e.toString()}'
               RETURNING *
             )
             UPDATE pde.patch p
@@ -58,9 +58,9 @@ async function executeDevDeployment(args, pgClient) {
             FROM new_patch np
             WHERE p.id = ${patch.id}
           `
-          clog('blah', blah)
-            const ddlSqlResult = await pgClient.query(blah, []);
-          clog('ddlSqlResult', ddlSqlResult)
+          clog.error('devDeploymentSql', devDeploymentSql)
+          const ddlSqlResult = await pgClient.query(devDeploymentSql, []);
+          clog.error('ddlSqlResult', ddlSqlResult)
         } catch (e) {
           clog('wtf', e)
         }
