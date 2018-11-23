@@ -155,7 +155,9 @@ export default {
       this.$router.push({ name: 'newProject' })
     },
     projectCreated (project) {
+      console.log('pc', project)
       const devRelease = project.releases.nodes.find(r => r.status === 'DEVELOPMENT')
+      console.log('devRelease', devRelease)
       this.$store.commit('focusReleaseId', { focusReleaseId: (devRelease || {id: ''}).id })
       this.manageProject()
     },

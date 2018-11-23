@@ -1,4 +1,5 @@
-const FlowBabelWebpackPlugin = require('flow-babel-webpack-plugin');
+// const FlowBabelWebpackPlugin = require('flow-babel-webpack-plugin');
+const FlowBabelWebpackPlugin = require('babel-plugin-transform-flow-strip-types')
 const path = require('path')
 
 module.exports = {
@@ -20,7 +21,8 @@ module.exports = {
   },
   configureWebpack: {
     plugins: [
-      new FlowBabelWebpackPlugin()
+      // 'babel-plugin-transform-flow-strip-types'
+      // new FlowBabelWebpackPlugin()
     ],
     resolve: {
       alias: {

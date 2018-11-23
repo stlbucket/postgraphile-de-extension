@@ -45,6 +45,7 @@
     "@vue/cli-plugin-eslint": "^3.0.3",
     "@vue/cli-service": "^3.0.3",
     "babel-loader": "^8.0.2",
+    "babel-plugin-transform-flow-strip-types": "^6.22.0",
     "eslint-config-prettier": "2.5.0",
     "eslint-plugin-graphql": "^2.1.1",
     "flow-babel-webpack-plugin": "^1.1.1",

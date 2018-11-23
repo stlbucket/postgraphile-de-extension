@@ -11,9 +11,9 @@ const port = process.env.PORT
 const connection = process.env.POSTGRES_CONNECTION
 const schemas = process.env.POSTGRAPHILE_SCHEMAS.split(',')
 const dynamicJson = process.env.DYNAMIC_JSON === 'true'
-// const pgDefaultRole = process.env.DEFAULT_ROLE
-// const jwtSecret = process.env.JWT_SECRET
-// const jwtPgTypeIdentifier = process.env.JWT_PG_TYPE_IDENTIFIER
+const pgDefaultRole = process.env.DEFAULT_ROLE
+const jwtSecret = process.env.JWT_SECRET
+const jwtPgTypeIdentifier = process.env.JWT_PG_TYPE_IDENTIFIER
 const extendedErrors = process.env.EXTENDED_ERRORS
 const disableDefaultMutations = process.env.DISABLE_DEFAULT_MUTATIONS === 'false'
 const enableApolloEngine = process.env.ENABLE_APOLLO_ENGINE === 'true'
@@ -27,9 +27,9 @@ app.use(postgraphile(
   ,schemas
   ,{
     dynamicJson: dynamicJson
-    // ,pgDefaultRole: pgDefaultRole
-    // ,jwtSecret: jwtSecret
-    // ,jwtPgTypeIdentifier: jwtPgTypeIdentifier
+    ,pgDefaultRole: pgDefaultRole
+    ,jwtSecret: jwtSecret
+    ,jwtPgTypeIdentifier: jwtPgTypeIdentifier
     ,showErrorStack: true
     ,extendedErrors: ['severity', 'code', 'detail', 'hint', 'positon', 'internalPosition', 'internalQuery', 'where', 'schema', 'table', 'column', 'dataType', 'constraint', 'file', 'line', 'routine']
     ,disableDefaultMutations: disableDefaultMutations

@@ -63,9 +63,6 @@ export default {
             nodes: []
           }
         }
-        // console.log('this.project', this.project)
-        // this.$store.commit('focusReleaseId', { focusReleaseId: (this.project.releases.nodes[0] || {id: ''}).id })
-        // this.$eventHub.$emit('projectFocus', this.project.id)
       }
     }
   },

@@ -72,7 +72,8 @@ export default {
                             patch => {
                               return {
                                 id: patch.id,
-                                name: `${patch.number} - ${patch.patchType.name}`,
+                                // name: `${patch.number} - ${patch.patchType.name}`,
+                                name: `${patch.number.split('.')[2]} - ${patch.patchType.name}`,
                                 children: []
                               }
                             }

@@ -17,7 +17,7 @@
               <v-icon small @click="promotePatch(patch)" :disabled="promoteDisabled(patch)">vertical_align_top</v-icon>
               <v-icon small @click="demotePatch(patch)" :disabled="demoteDisabled(patch)">vertical_align_bottom</v-icon>
               <v-icon :color="patchStatusColor(patch)" small>fiber_manual_record</v-icon>
-              {{ `Patch: ${patch.number.split('.')[2]} - ${patch.patchType.name} - ${patch.artifact.name}` }}
+              {{ `${patch.number.split('.')[2]} - ${patch.patchType.name} - ${patch.artifact.name}` }}
             </v-list-tile-sub-title>
           </v-list-tile-content>
 

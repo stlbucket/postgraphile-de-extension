@@ -47,8 +47,8 @@ export default {
     }
   },
   methods: {
-    projectImported (projectId) {
-      this.selectedProjectId = projectId
+    projectImported (project) {
+      this.selectedProjectId = project.id
       this.$apollo.queries.init.refetch()
     },
    },
@@ -60,9 +60,11 @@ export default {
     }
   },
   created () {
+    this.$eventHub.$on('projectCreated', this.projectImported)
     this.$eventHub.$on('projectImported', this.projectImported)
   },
   beforeDestroy() {
+    this.$eventHub.$off('projectCreated')
     this.$eventHub.$off('projectImported')
   }
 }

@@ -46,7 +46,7 @@ export default {
       })
       .then(result => {
         console.log('result', result)
-        this.$eventHub.$emit('projectImported', result.data.importProject.pdeProject.id)
+        this.$eventHub.$emit('projectImported', result.data.importProject.pdeProject)
         this.$router.push({ name: 'projectDetail', params: { id: result.data.importProject.pdeProject.id}})
       })
       .catch(error => {
