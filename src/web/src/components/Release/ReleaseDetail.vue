@@ -94,20 +94,17 @@ export default {
     }
   },
   computed: {
-    focusReleaseId () {      
-      return this.$store.state.focusReleaseId
-    }
   },
   apollo: {
     init: {
       query: releasePatchTree,
       variables () {
         return {
-          id: this.focusReleaseId
+          id: this.id
         }
       },
       skip () {
-        return this.focusReleaseId === ''
+        return this.id === ''
       },
       fetchPolicy: 'network-only',
       update (result) {
@@ -115,6 +112,12 @@ export default {
       }
     }
 
+  },
+  props: {
+    id: {
+      type: String,
+      required: true
+    }
   },
   data () {
     return {

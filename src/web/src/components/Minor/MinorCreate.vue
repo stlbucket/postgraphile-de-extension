@@ -17,6 +17,12 @@ export default {
   name: "MinorCreate",
   components: {
   },
+  props: {
+    releaseId: {
+      type: String,
+      required: true
+    }
+  },
   methods: {
     cancel () {
       this.$router.go(-1)
@@ -39,9 +45,6 @@ export default {
     }
   },
   computed: {
-    releaseId () {
-      return this.$store.state.focusReleaseId
-    },
     createDisabled () {
       return this.minorName === ''
     }

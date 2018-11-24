@@ -123,7 +123,7 @@ export default new Router({
       props: true
     },
     {
-      path: "/newMinor",
+      path: "/newMinor/:releaseId",
       name: "newMinor",
       component: MinorCreate,
       props: true

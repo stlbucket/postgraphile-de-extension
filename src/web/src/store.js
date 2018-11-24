@@ -15,7 +15,7 @@ function doClearFocus(state){
 export default new Vuex.Store({
   state: {
     focusProjectId: '',
-    focusReleaseId: '',
+    // focusReleaseId: '',
     focusSchemaId: '',
     focusArtifactTypeId: '',
     focusArtifactId: '',
@@ -30,10 +30,10 @@ export default new Vuex.Store({
       doClearFocus(state)
       state.focusProjectId = payload.focusProjectId
     },
-    focusReleaseId (state, payload) {
-      doClearFocus(state)
-      state.focusReleaseId = payload.focusReleaseId
-    },
+    // focusReleaseId (state, payload) {
+    //   doClearFocus(state)
+    //   state.focusReleaseId = payload.focusReleaseId
+    // },
     focusSchemaId (state, payload) {
       doClearFocus(state)
       state.focusSchemaId = payload.focusSchemaId

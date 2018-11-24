@@ -70,14 +70,14 @@
       </v-tooltip>
     </v-toolbar>
     <release-navigator 
-      :pdeProjectId="pdeProjectId"
+      :focusRelease="focusRelease"
     ></release-navigator>
   </div>
 </template>
 
 <script>
 import ReleaseNavigator from './ReleaseNavigator'
-// import allProjects from '../../gql/query/allProjects.gql'
+import pdeProjectById from '../../gql/query/pdeProjectById.gql'
 const SELECTED_PROJECT_ID = 'selectedProjectId'
 
 export default {
@@ -87,6 +87,9 @@ export default {
   },
   computed: {
     currentProjectId () {
+      return this.$store.state.focusProjectId
+    },
+    selectedProjectId () {
       return this.$store.state.focusProjectId
     },
     focusSchemaId () {
@@ -106,10 +109,10 @@ export default {
     }
   },
   watch: {  // todo - convert as many watchers as possible
-    currentProjectId: {
-      handler: 'manageProject',
-      immediate: true
-    },
+    // currentProjectId: {
+    //   handler: 'manageProject',
+    //   immediate: true
+    // },
     focusSchemaId: {
       handler: 'schemaDetail',
       immediate: true
@@ -158,7 +161,7 @@ export default {
       console.log('pc', project)
       const devRelease = project.releases.nodes.find(r => r.status === 'DEVELOPMENT')
       console.log('devRelease', devRelease)
-      this.$store.commit('focusReleaseId', { focusReleaseId: (devRelease || {id: ''}).id })
+      // this.$store.commit('focusReleaseId', { focusReleaseId: (devRelease || {id: ''}).id })
       this.manageProject()
     },
     exportProject () {
@@ -188,11 +191,8 @@ export default {
     newSchema (release) {
       this.$router.push({ name: 'newSchema', params: { releaseId: release.id }})
     },
-    newMinor (release) {
-      this.$router.push({ name: 'newMinor', params: { releaseId: release.id }})
-    },
     newMinorCreated (minor) {
-      this.$store.commit('focusReleaseId', { focusReleaseId: minor.releaseId})
+      // this.$store.commit('focusReleaseId', { focusReleaseId: minor.releaseId})
       this.$router.push({ name: 'releaseDetail', params: { id: minor.releaseId }})
     },
     newPatch (minor) {
@@ -211,7 +211,9 @@ export default {
       this.$router.push({ name: 'test-graph-ql', params: { id: test.id }})
     },
     exploreRelease (release) {
-      this.$store.commit('focusReleaseId', { focusReleaseId: release.id })
+      // this.$store.commit('focusReleaseId', { focusReleaseId: release.id })
+      console.log('FOCUS THIS', release)
+      this.focusRelease = release
       this.$router.push({ name: 'releaseDetail', params: { id: release.id }})
     },
     newDevelopmentRelease () {
@@ -222,7 +224,41 @@ export default {
     return {
       projects: [],
       pdeProjectId: '',
-      selectedProjectId: null
+      // selectedProjectId: null,
+      focusReleaseId: '',
+      focusRelease: {},
+      pdeProject: null
+    }
+  },
+  apollo: { 
+    init: {
+      query: pdeProjectById,
+      variables () {
+        return {
+          id: this.selectedProjectId
+        }
+      },
+      fetchPolicy: 'network-only',
+      skip () {
+        return this.selectedProjectId === ''
+      },
+      update (result) {
+        console.log('PROJECT', result)
+        this.pdeProject = result.pdeProjectById || {
+          releases: {
+            nodes: []
+          }
+        }
+        this.releases = this.pdeProject.releases.nodes.map(
+          release => {
+            return Object.assign({
+              displayName: `${release.number} - ${release.name}`
+            }, release)
+          }
+        )
+
+        this.focusRelease = this.releases.find(r => r.status === 'DEVELOPMENT')
+      }
     }
   },
   created () {
@@ -231,7 +267,6 @@ export default {
     this.$eventHub.$on('newSchema', this.newSchema)  
     this.$eventHub.$on('exploreRelease', this.exploreRelease)  
     this.$eventHub.$on('newDevelopmentRelease', this.newDevelopmentRelease)  
-    this.$eventHub.$on('newMinor', this.newMinor)  
     this.$eventHub.$on('newGraphQLQuery', this.newGraphQLQuery)  
     this.$eventHub.$on('newPgTapTest', this.newPgTapTest)  
     this.$eventHub.$on('newGraphQLTest', this.newGraphQLTest)
@@ -245,7 +280,6 @@ export default {
     this.$eventHub.$off('newSchema')
     this.$eventHub.$off('exploreRelease')
     this.$eventHub.$off('newDevelopmentRelease')
-    this.$eventHub.$off('newMinor')
     this.$eventHub.$off('newGraphQLQuery')
     this.$eventHub.$off('newPgTapTest')
     this.$eventHub.$off('newGraphQLTest')
