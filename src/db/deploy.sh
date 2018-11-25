@@ -32,7 +32,7 @@ packages=(
   ./scripts/0300-release-ddl.sql
   ./scripts/0400-seed-data.sql
   ./scripts/1000-import-project.sql
-  # ./scripts/9999-seed.sql
+  ./scripts/9999-seed.sql
 )
 
 for i in ${packages[@]};
