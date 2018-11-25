@@ -184,7 +184,7 @@ BEGIN
     INSERT INTO pde.major(project_id, revision, name) SELECT _release.project_id, 1, '0001' RETURNING * INTO _current_major;
   END IF;
 
-  _revision := (SELECT count(*) FROM pde.minor WHERE major_id = _current_major.id and release_id = _release.id) + 1;
+  _revision := (SELECT coalesce(max(revision),0) FROM pde.minor WHERE major_id = _current_major.id) + 1;
 
   INSERT INTO pde.minor(
     major_id
