@@ -14,6 +14,16 @@ async function writeReleaseToDisk(release){
   const sqitchUser = process.env.PDE_SQITCH_USER
   const sqitchEmail = process.env.PDE_SQITCH_EMAIL
 
+  clog('WRITE TO DISK THIS RELEASE', release)
+
+  const previousRelease = release.status === 'CURRENT'
+    ? (release['@project']['@historicReleases']['data'][0] || {'@nodes': null})['@nodes']
+    : (release['@project']['@currentReleases']['data'][0] || {'@nodes': null})['@nodes']
+
+    clog('currents', release['@project']['@currentReleases']['data'][0])
+    clog('historics', release['@project']['@historicReleases']['data'][0])
+    clog('PREVIOUS RELEASE', previousRelease)
+
   const projectName = release['@project'].name
   const pdeRootDirectory = process.env.PDE_ROOT_DIRECTORY
   const environmentDirectory = `${process.cwd()}${pdeRootDirectory}/${projectName}/${release.status.toLowerCase()}`
@@ -34,6 +44,7 @@ async function writeReleaseToDisk(release){
   clog('ensureDirResults', ensureDirResults)
 
   const deployContents = `-- Deploy ${projectName}:${release.number} to pg
+${previousRelease ? `-- requires: ${previousRelease.number}` : ``}
 
 BEGIN;
 
@@ -73,7 +84,7 @@ COMMIT;
 %project=${projectName}
 %uri=sqitch-${projectName}/${release.number}
 
-${release.number}-deploy.sql ${moment.utc().format()} ${sqitchUser} <${sqitchEmail}> # ${release.number} deployment
+${release.number} ${previousRelease ? `[${previousRelease.number}]` : ``} ${moment.utc().format()} ${sqitchUser} <${sqitchEmail}> # ${release.number} deployment
 `
 
 clog('planContents', planContents)

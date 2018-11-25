@@ -237,7 +237,7 @@ export default {
       selectedItems: [],
       panel: [],
       expand: true,
-      hidden: true
+      hidden: this.minor.patches.nodes.length > 0
     }
   },
 }

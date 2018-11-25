@@ -91,6 +91,31 @@ mutation ReleaseToStaging(
       project: pdeProjectByProjectId {
         id
         name
+        currentReleases: releasesByProjectId(
+          filter: {
+            status: {equalTo: CURRENT}
+          }
+        ) {
+          nodes {
+            id
+            name
+            number
+            status
+          }
+        }
+        historicReleases: releasesByProjectId(
+          filter: {
+            status: {equalTo: HISTORIC}
+          }
+          orderBy: NUMBER_DESC
+        ) {
+          nodes {
+            id
+            name
+            number
+            status
+          }
+        }      
       }
       parentRelease: releaseByParentReleaseId {
         id
