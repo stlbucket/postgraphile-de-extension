@@ -27,9 +27,9 @@ app.use(postgraphile(
   ,schemas
   ,{
     dynamicJson: dynamicJson
-    ,pgDefaultRole: pgDefaultRole
-    ,jwtSecret: jwtSecret
-    ,jwtPgTypeIdentifier: jwtPgTypeIdentifier
+    // ,pgDefaultRole: pgDefaultRole
+    // ,jwtSecret: jwtSecret
+    // ,jwtPgTypeIdentifier: jwtPgTypeIdentifier
     ,showErrorStack: true
     ,extendedErrors: ['severity', 'code', 'detail', 'hint', 'positon', 'internalPosition', 'internalQuery', 'where', 'schema', 'table', 'column', 'dataType', 'constraint', 'file', 'line', 'routine']
     ,disableDefaultMutations: disableDefaultMutations

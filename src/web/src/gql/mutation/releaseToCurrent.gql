@@ -8,7 +8,90 @@ mutation ReleaseToCurrent(
       id
       name
       number
+      locked
       status
+      ddlUp
+      ddlDown
+      minors: minorsByReleaseId(
+        orderBy: NUMBER_ASC
+      ) {
+        nodes {
+          id
+          number
+          name
+          revision
+          locked
+          release: releaseByReleaseId {
+            id
+            name
+            number
+            status
+          }
+          major: majorByMajorId {
+            id
+            revision
+            name
+          }
+          patches: patchesByMinorId(
+            orderBy: NUMBER_ASC
+          ) {
+            nodes {
+              id
+              number
+              revision
+              locked
+              artifactId
+              devDeployment: devDeploymentByDevDeploymentId {
+                id
+                status
+              }
+              patchType: patchTypeByPatchTypeId {
+                id
+                name
+                key
+                ddlUpTemplate
+                ddlDownTemplate
+              }
+              artifact: artifactByArtifactId {
+                id
+                name
+                schema: schemaBySchemaId {
+                  id
+                  name
+                }
+                artifactType: artifactTypeByArtifactTypeId {
+                  id
+                  name
+                }
+              }
+            }
+          }
+          gqlTests: testsByMinorId(filter: {
+            type: {equalTo: GRAPH_QL}
+          }) {
+            nodes {
+              id
+              name
+              script
+              type
+            }
+          }
+          pgtTests: testsByMinorId(filter: {
+            type: {equalTo: PG_TAP}
+          }) {
+            nodes {
+              id
+              name
+              script
+              type
+            }
+          }
+        }
+      }
+      project: pdeProjectByProjectId {
+        id
+        name
+      }
       parentRelease: releaseByParentReleaseId {
         id
         name

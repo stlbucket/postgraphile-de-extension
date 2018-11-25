@@ -86,9 +86,6 @@ export default {
     ReleaseNavigator
   },
   computed: {
-    currentProjectId () {
-      return this.$store.state.focusProjectId
-    },
     selectedProjectId () {
       return this.$store.state.focusProjectId
     },
@@ -109,10 +106,10 @@ export default {
     }
   },
   watch: {  // todo - convert as many watchers as possible
-    // currentProjectId: {
-    //   handler: 'manageProject',
-    //   immediate: true
-    // },
+    selectedProjectId: {
+      handler: 'manageProject',
+      immediate: true
+    },
     focusSchemaId: {
       handler: 'schemaDetail',
       immediate: true
@@ -161,7 +158,6 @@ export default {
       console.log('pc', project)
       const devRelease = project.releases.nodes.find(r => r.status === 'DEVELOPMENT')
       console.log('devRelease', devRelease)
-      // this.$store.commit('focusReleaseId', { focusReleaseId: (devRelease || {id: ''}).id })
       this.manageProject()
     },
     exportProject () {
@@ -192,7 +188,6 @@ export default {
       this.$router.push({ name: 'newSchema', params: { releaseId: release.id }})
     },
     newMinorCreated (minor) {
-      // this.$store.commit('focusReleaseId', { focusReleaseId: minor.releaseId})
       this.$router.push({ name: 'releaseDetail', params: { id: minor.releaseId }})
     },
     newPatch (minor) {
@@ -211,7 +206,6 @@ export default {
       this.$router.push({ name: 'test-graph-ql', params: { id: test.id }})
     },
     exploreRelease (release) {
-      // this.$store.commit('focusReleaseId', { focusReleaseId: release.id })
       console.log('FOCUS THIS', release)
       this.focusRelease = release
       this.$router.push({ name: 'releaseDetail', params: { id: release.id }})
@@ -224,8 +218,6 @@ export default {
     return {
       projects: [],
       pdeProjectId: '',
-      // selectedProjectId: null,
-      focusReleaseId: '',
       focusRelease: {},
       pdeProject: null
     }
@@ -243,7 +235,6 @@ export default {
         return this.selectedProjectId === ''
       },
       update (result) {
-        console.log('PROJECT', result)
         this.pdeProject = result.pdeProjectById || {
           releases: {
             nodes: []

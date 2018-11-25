@@ -6,7 +6,10 @@ const plugins = [
   require('postgraphile-plugin-connection-filter'),
   require(`${__dirname}/graphile-extensions/installPde`),
   require(`${__dirname}/graphile-extensions/devDeploy`),
-  require(`${__dirname}/graphile-extensions/execSql`)
+  require(`${__dirname}/graphile-extensions/execSql`),
+  require(`${__dirname}/graphile-extensions/releaseToTesting`),
+  require(`${__dirname}/graphile-extensions/releaseToStaging`),
+  require(`${__dirname}/graphile-extensions/releaseToCurrent`),
 ]
 
 const connection = process.env.POSTGRES_CONNECTION
