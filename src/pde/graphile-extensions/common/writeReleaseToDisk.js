@@ -14,43 +14,64 @@ async function writeReleaseToDisk(release){
   const sqitchUser = process.env.PDE_SQITCH_USER
   const sqitchEmail = process.env.PDE_SQITCH_EMAIL
 
+  const projectName = release['@project'].name
   const pdeRootDirectory = process.env.PDE_ROOT_DIRECTORY
-  const environmentDirectory = `${process.cwd()}${pdeRootDirectory}/${release.status.toLowerCase()}`
-  // const releaseDirectoryCurrent = `${process.cwd()}${pdeRootDirectory}/${release.status.toLowerCase()}/current`
-  // const deployDirectoryCurrent = `${releaseDirectoryCurrent}/deploy`
-  // const revertDirectoryCurrent = `${releaseDirectoryCurrent}/revert`
-  // const verifyDirectoryCurrent = `${releaseDirectoryCurrent}/verify`
+  const environmentDirectory = `${process.cwd()}${pdeRootDirectory}/${projectName}/${release.status.toLowerCase()}`
   const releaseDirectory = `${environmentDirectory}/${release.number}`
   const deployDirectory = `${releaseDirectory}/deploy`
   const revertDirectory = `${releaseDirectory}/revert`
   const verifyDirectory = `${releaseDirectory}/verify`
+  const deployFile = `${deployDirectory}/${release.number}.sql`
+  const revertFile = `${revertDirectory}/${release.number}.sql`
+  const verifyFile = `${verifyDirectory}/${release.number}.sql`
 
   const ensureDirResults = await Promise.all([
-    // ensureDir(deployDirectoryCurrent),
-    // ensureDir(revertDirectoryCurrent),
-    // ensureDir(verifyDirectoryCurrent),
     ensureDir(deployDirectory),
     ensureDir(revertDirectory),
     ensureDir(verifyDirectory),
   ])
   
   clog('ensureDirResults', ensureDirResults)
+
+  const deployContents = `-- Deploy ${projectName}:${release.number} to pg
+
+BEGIN;
+
+${release['@ddlUp']}
+
+COMMIT;
+  `
+  
+  const revertContents = `-- Revert ${projectName}:${release.number} from pg
+
+BEGIN;
+
+${release['@ddlDown']}
+
+COMMIT;
+  `
+  
+  const verifyContents = `-- Verify ${projectName}:${release.number} on pg
+
+BEGIN;
+
+-- NOT IMPLEMENTED
+
+COMMIT;
+  `
   
 
   const writeFileResults = await Promise.all([
-    // writeFile(`${deployDirectoryCurrent}/${release.number}-deploy.sql`, release['@ddlUp']),
-    // writeFile(`${revertDirectoryCurrent}/${release.number}-revert.sql`, release['@ddlDown']),
-    // writeFile(`${verifyDirectoryCurrent}/${release.number}-verify.sql`, '-- NOT IMPLEMENTED'),
-    writeFile(`${deployDirectory}/${release.number}-deploy.sql`, release['@ddlUp']),
-    writeFile(`${revertDirectory}/${release.number}-revert.sql`, release['@ddlDown']),
-    writeFile(`${verifyDirectory}/${release.number}-verify.sql`, '-- NOT IMPLEMENTED'),
+    writeFile(`${deployFile}`, deployContents),
+    writeFile(`${revertFile}`, revertContents),
+    writeFile(`${verifyFile}`, verifyContents),
   ])
   
   clog('writeFileResults', writeFileResults)
 
   const planContents = `%syntax-version=1.0.0
-%project=${release['@project'].name}
-%uri=sqitch-${release['@project'].name}/${release.number}
+%project=${projectName}
+%uri=sqitch-${projectName}/${release.number}
 
 ${release.number}-deploy.sql ${moment.utc().format()} ${sqitchUser} <${sqitchEmail}> # ${release.number} deployment
 `

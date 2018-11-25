@@ -4,30 +4,37 @@
       @click="newPatch"
       :disabled="newPatchDisabled"
     >New Patch</v-btn>
-    <v-list>
-      <template v-for="(patch, index) in minor.patches.nodes">
-        <v-list-tile
-          :key="patch.id"
-          ripple
-          @click="selected(patch)"
-          :class="getCssClass(patch)"
-        >
-          <v-list-tile-content>
-            <v-list-tile-sub-title class="text--primary">
-              <v-icon small @click="promotePatch(patch)" :disabled="promoteDisabled(patch)">vertical_align_top</v-icon>
-              <v-icon small @click="demotePatch(patch)" :disabled="demoteDisabled(patch)">vertical_align_bottom</v-icon>
-              <v-icon :color="patchStatusColor(patch)" small>fiber_manual_record</v-icon>
-              {{ `${patch.number.split('.')[2]} - ${patch.patchType.name} - ${patch.artifact.name}` }}
-            </v-list-tile-sub-title>
-          </v-list-tile-content>
+    <v-container
+        id="scroll-target"
+        style="max-height: 256px"
+        class="scroll-y"
+      >
+      <v-list>
+        <template v-for="(patch, index) in minor.patches.nodes">
+          <v-list-tile
+            v-scroll:#scroll-target="onScroll"
+            :key="patch.id"
+            ripple
+            @click="selected(patch)"
+            :class="getCssClass(patch)"
+          >
+            <v-list-tile-content>
+              <v-list-tile-sub-title class="text--primary">
+                <v-icon small @click="promotePatch(patch)" :disabled="promoteDisabled(patch)">vertical_align_top</v-icon>
+                <v-icon small @click="demotePatch(patch)" :disabled="demoteDisabled(patch)">vertical_align_bottom</v-icon>
+                <v-icon :color="patchStatusColor(patch)" small>fiber_manual_record</v-icon>
+                {{ `${patch.number.split('.')[2]} - ${patch.patchType.name} - ${patch.artifact.name}` }}
+              </v-list-tile-sub-title>
+            </v-list-tile-content>
 
-        </v-list-tile>
-        <v-divider
-          v-if="index + 1 < items.length"
-          :key="index"
-        ></v-divider>
-      </template>
-    </v-list>        
+          </v-list-tile>
+          <v-divider
+            v-if="index + 1 < items.length"
+            :key="index"
+          ></v-divider>
+        </template>
+      </v-list>        
+    </v-container>
   </div>
 </template>
 

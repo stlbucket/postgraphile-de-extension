@@ -237,7 +237,7 @@ export default {
       selectedItems: [],
       panel: [],
       expand: true,
-      hidden: false
+      hidden: true
     }
   },
 }

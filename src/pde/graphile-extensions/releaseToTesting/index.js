@@ -1,7 +1,7 @@
 // https://www.graphile.org/postgraphile/extending-raw/#wrapping-an-existing-resolver
 
 const clog = require('fbkt-clog')
-const writeReleaseToDisk = require('./writeReleaseToDisk')
+const writeReleaseToDisk = require('../common/writeReleaseToDisk')
 
 module.exports = function ReleaseToTesting(builder) {
   builder.hook(
