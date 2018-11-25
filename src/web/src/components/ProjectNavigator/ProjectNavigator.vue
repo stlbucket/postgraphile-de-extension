@@ -212,6 +212,15 @@ export default {
     },
     newDevelopmentRelease () {
       this.$router.push({ name: 'newDevelopmentRelease'})
+    },
+    releasedToTesting () {
+      this.$apollo.queries.init.refetch()
+    },
+    releasedToStaging () {
+      this.$apollo.queries.init.refetch()
+    },
+    releasedToCurrent () {
+      this.$apollo.queries.init.refetch()
     }
   },
   data () {
@@ -235,6 +244,15 @@ export default {
         return this.selectedProjectId === ''
       },
       update (result) {
+        console.log('PROJECT', result.pdeProjectById.releases.nodes.map(
+          release => {
+            return {
+              name: release.name,
+              number: release.number,
+              status: release.status
+            }
+          }
+        ))
         this.pdeProject = result.pdeProjectById || {
           releases: {
             nodes: []
@@ -248,7 +266,7 @@ export default {
           }
         )
 
-        this.focusRelease = this.releases.find(r => r.status === 'DEVELOPMENT')
+        this.focusRelease = this.releases.find(r => r.status === 'DEVELOPMENT') || {}
       }
     }
   },
@@ -264,6 +282,9 @@ export default {
     this.$eventHub.$on('newDevelopmentReleaseCreated', this.exploreRelease)
     this.$eventHub.$on('newMinorCreated', this.newMinorCreated)
     this.$eventHub.$on('projectCreated', this.projectCreated)
+    this.$eventHub.$on('releasedToTesting', this.releasedToTesting)
+    this.$eventHub.$on('releasedToStaging', this.releasedToStaging)
+    this.$eventHub.$on('releasedToCurrent', this.releasedToCurrent)
   },
   beforeDestroy() {
     this.$eventHub.$off('newPatch')
@@ -277,6 +298,9 @@ export default {
     this.$eventHub.$off('newDevelopmentReleaseCreated')
     this.$eventHub.$off('newMinorCreated')
     this.$eventHub.$off('projectCreated')
+    this.$eventHub.$off('releasedToTesting')
+    this.$eventHub.$off('releasedToStaging')
+    this.$eventHub.$off('releasedToCurrent')
   }
 }
 </script>

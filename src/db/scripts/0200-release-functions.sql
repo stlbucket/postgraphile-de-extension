@@ -247,7 +247,7 @@ BEGIN
   )
   SELECT
     _name
-    ,'N/A.development'
+    ,'DEVELOPMENT'
     ,'DEVELOPMENT'
     ,_project_id
     ,null
@@ -273,6 +273,7 @@ DECLARE
   _staging_release pde.release;
   _current_release pde.release;
   _parent_release pde.release;
+  _new_development_release pde.release;
 BEGIN
   SELECT *
   INTO _staging_release
@@ -309,7 +310,7 @@ BEGIN
   WHERE id = _parent_release.id
   ;
 
---  PERFORM pde.build_development_release(_project_id);
+ _new_development_release := (select pde.build_development_release(_project_id, 'Next'));
 
   return _current_release;
 END;

@@ -37,7 +37,7 @@
         <v-toolbar-title> {{ releaseDisplay(developmentRelease) }}</v-toolbar-title>
         <v-spacer></v-spacer>
         <div v-if="showExplore(developmentRelease)">
-          <v-btn @click="releaseToTesting(developmentRelease)">Release to Testing</v-btn>
+          <v-btn @click="releaseToTesting(developmentRelease)" :disabled="releaseToTestingDisabled">Release to Testing</v-btn>
           <v-btn @click="stashRelease">Stash</v-btn>
           <v-btn @click="explore(developmentRelease)">Explore</v-btn>
         </div>
@@ -132,7 +132,7 @@ export default {
         }
       })
       .then(result => {
-        this.$eventHub.$emit('releaseToCurrent', result.data.releaseToCurrent.release)
+        this.$eventHub.$emit('releasedToCurrent', result.data.releaseToCurrent.release)
       })
       .catch(error => {
         alert('ERROR')
@@ -147,7 +147,7 @@ export default {
         }
       })
       .then(result => {
-        this.$eventHub.$emit('releaseToTesting', result.data.releaseToTesting.release)
+        this.$eventHub.$emit('releasedToTesting', result.data.releaseToTesting.release)
       })
       .catch(error => {
         alert('ERROR')
@@ -162,8 +162,7 @@ export default {
         }
       })
       .then(result => {
-        console.log('result', result)
-        this.$eventHub.$emit('releaseToStaging', result.data.releaseToStaging.release)
+        this.$eventHub.$emit('releasedToStaging', result.data.releaseToStaging.release)
       })
       .catch(error => {
         alert('ERROR')
@@ -219,6 +218,15 @@ export default {
     },
     stagingDeprecatedReleases () {
       return this.releases.filter(r => r.status === 'STAGING_DEPRECATED')
+    },
+    releaseToTestingDisabled () {
+      return this.developmentRelease 
+        ? this.developmentRelease.minors.nodes.length === 0 || this.developmentRelease.minors.nodes.reduce(
+          (acc, minor) => {
+            return acc + minor.patches.nodes.length
+          }, 0
+        ) === 0
+        : true
     }
   },
   watch: {
