@@ -10,6 +10,7 @@ const plugins = [
   require(`${__dirname}/graphile-extensions/releaseToTesting`),
   require(`${__dirname}/graphile-extensions/releaseToStaging`),
   require(`${__dirname}/graphile-extensions/releaseToCurrent`),
+  require(`${__dirname}/graphile-extensions/readPdeDirectory`),
 ]
 
 const connection = process.env.POSTGRES_CONNECTION

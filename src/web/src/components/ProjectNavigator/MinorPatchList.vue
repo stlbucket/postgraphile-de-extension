@@ -12,7 +12,6 @@
       <v-list>
         <template v-for="(patch, index) in minor.patches.nodes">
           <v-list-tile
-            v-scroll:#scroll-target="onScroll"
             :key="patch.id"
             ripple
             @click="selected(patch)"
