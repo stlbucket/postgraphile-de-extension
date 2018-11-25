@@ -25,6 +25,7 @@
         </v-tooltip>
       </div>
       <v-spacer></v-spacer> 
+      <v-icon :color="deploymentStatusColor">fiber_manual_record</v-icon>
       <h3>{{ `${minor.number.split('.')[1]}-${minor.name}` }}</h3>
       <v-spacer></v-spacer> 
       <v-toolbar-side-icon @click="toggleMinorHidden()"></v-toolbar-side-icon>
@@ -219,6 +220,13 @@ export default {
         default:
           return ''
       }
+    },
+    deploymentStatusColor () {
+      const errorPatch = this.minor.patches.nodes.find(p => (p.devDeployment || {}).status === 'ERROR')
+      const undeployedPatch = this.minor.patches.nodes.find(p => p.devDeployment === null || p.devDeployment === undefined)
+      if (errorPatch) return 'red'
+      if (undeployedPatch) return 'yellow'
+      return 'green'
     }
   },
   props: {
